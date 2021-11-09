@@ -6,8 +6,12 @@ app.use(fileUpload());
 
 const http = require('http');
 const server = http.createServer(app);
+const { Server } = require('socket.io');
+const io = new Server(server);
+
 const fs = require('fs');
 const Parser = require('./parserInterface');
+const RoomCode = require('./lib/generateRoomCode');
 
 app.get('/', (req, res) => {
     res.send('<h1>Hello world</h1>');
@@ -49,10 +53,25 @@ app.post('/upload', async (req, res) => {
         }
     }
     const data = await Parser.process(filenames);
-    console.log(data);
-    res.send(data);
-  });
+    const roomCode = RoomCode.generate();
+    res.send({
+        roomCode: roomCode,
+        data: data
+    });
+});
+
+io.on('connection', (socket) => {
+    console.log('a user connected');
+});
+
+io.on('enter-room', (socket, roomCode) => {
+    socket.join(roomCode);
+});
+
+io.on('update-room', (socket, roomCode, config) => {
+    socket.to(roomCode).emit('update-event', config);
+});
 
 server.listen(3000, () => {
     console.log('listening on *:3000');
-})
+});
