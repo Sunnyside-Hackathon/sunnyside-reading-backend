@@ -4,14 +4,19 @@ const cors = require('cors');
 const app = express();
 
 app.use(fileUpload());
-app.use(cors());
+app.use(cors({
+    origin: ['*'],
+    credentials: false,
+    methods: ['GET', 'POST']
+}));
 
 const http = require('http');
 const server = http.createServer(app);
-// const { Server } = require('socket.io');
-const io = require('socket.io')(server, {
+const { Server } = require('socket.io');
+const io = new Server(server, {
     cors: {
-        origin: '*',
+        origin: ['*'],
+        credentials: false,
         methods: ['GET', 'POST']
     }
 });
