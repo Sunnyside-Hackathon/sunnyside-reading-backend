@@ -1,8 +1,10 @@
 const express = require('express');
 const fileUpload = require('express-fileupload');
+const cors = require('cors');
 const app = express();
 
 app.use(fileUpload());
+app.use(cors());
 
 const http = require('http');
 const server = http.createServer(app);
