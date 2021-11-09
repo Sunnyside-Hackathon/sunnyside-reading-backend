@@ -62,6 +62,13 @@ app.post('/upload', async (req, res) => {
     });
 });
 
+app.post('/generateCode', async (req, res) => {
+    const roomCode = RoomCode.generate();
+    res.send({
+        roomCode: roomCode
+    });
+});
+
 io.on('connection', (socket) => {
     socket.on('enter-room', roomCode => {
         socket.join(roomCode);
