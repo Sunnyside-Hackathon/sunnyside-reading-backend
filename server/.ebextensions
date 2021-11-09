@@ -1,0 +1,11 @@
+# these commands run before the application and web server are 
+# set up and the application version file is extracted. 
+commands: 
+  01_install_PyPDF2: 
+    command: 'easy_install PyPDF2' 
+  02_install_docx2python: 
+    command: 'easy_install docx2python'  
+
+option_settings:
+  aws:elasticbeanstalk:container:nodejs:
+    NodeCommand: "npm start"
