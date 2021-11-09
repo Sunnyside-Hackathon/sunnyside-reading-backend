@@ -6,7 +6,7 @@ app.use(fileUpload());
 
 const http = require('http');
 const server = http.createServer(app);
-
+const fs = require('fs');
 const Parser = require('./parserInterface');
 
 app.get('/', (req, res) => {
@@ -30,6 +30,10 @@ app.post('/upload', async (req, res) => {
     }
 
     const filenames = [];
+
+    if (!fs.existsSync(`${__dirname}/temp`)) {
+        fs.mkdirSync(`${__dirname}/temp`)
+    }
 
     for (const filename of Object.keys(req.files)) {
         const name = req.files[filename].name;

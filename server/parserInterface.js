@@ -14,7 +14,7 @@ module.exports.process = async (filenames) => {
     for (const filename of filenames) {
         try {
             const spawn = require("child_process").spawn;
-            const pythonProcess = spawn('python', ['./parser.py', filename]);
+            const pythonProcess = spawn('python3', ['./parser.py', filename]);
 
             const result = await asyncProcessData(pythonProcess);
             const data = {
