@@ -46,7 +46,7 @@ app.post('/upload', async (req, res) => {
     }
     const data = await Parser.process(filenames);
     console.log(data);
-    res.send('Files Uploaded');
+    res.send(data);
   });
 
 server.listen(3000, () => {

@@ -12,15 +12,22 @@ module.exports.process = async (filenames) => {
     const parsedData = [];
 
     for (const filename of filenames) {
-        const spawn = require("child_process").spawn;
-        const pythonProcess = spawn('python', ['./parser.py', filename]);
+        try {
+            const spawn = require("child_process").spawn;
+            const pythonProcess = spawn('python', ['./parser.py', filename]);
 
-        const result = await asyncProcessData(pythonProcess);
-        const data = {
-            name: filename,
-            text: result.toString('utf8')
+            const result = await asyncProcessData(pythonProcess);
+            const data = {
+                name: filename,
+                text: result.toString('utf8')
+            }
+            parsedData.push(data);
+        } catch (e) {
+            parsedData.push({
+                name: filename,
+                text: e
+            });
         }
-        parsedData.push(data);
     }
 
     return parsedData;
