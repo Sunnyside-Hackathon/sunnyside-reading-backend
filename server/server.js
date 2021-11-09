@@ -61,15 +61,13 @@ app.post('/upload', async (req, res) => {
 });
 
 io.on('connection', (socket) => {
-    console.log('a user connected');
-});
+    socket.on('enter-room', roomCode => {
+        socket.join(roomCode);
+    });
 
-io.on('enter-room', (socket, roomCode) => {
-    socket.join(roomCode);
-});
-
-io.on('update-room', (socket, roomCode, config) => {
-    socket.to(roomCode).emit('update-event', config);
+    socket.on('update-room', (roomCode, config) => {
+        socket.to(roomCode).emit('update-event', config);
+    });
 });
 
 server.listen(3000, () => {
