@@ -3,6 +3,8 @@
 commands: 
   01_install: 
     command: "pip3 install -r requirements.txt"
+
+container_commands:
   make_temp:
     command: "mkdir temp"
 
