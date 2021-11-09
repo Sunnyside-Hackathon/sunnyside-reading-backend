@@ -7,6 +7,8 @@ app.use(fileUpload());
 const http = require('http');
 const server = http.createServer(app);
 
+const Parser = require('./parserInterface');
+
 app.get('/', (req, res) => {
     res.send('<h1>Hello world</h1>');
 });
@@ -42,7 +44,8 @@ app.post('/upload', async (req, res) => {
             console.log(e);
         }
     }
-    console.log(req.files);
+    const data = await Parser.process(filenames);
+    console.log(data);
     res.send('Files Uploaded');
   });
 
