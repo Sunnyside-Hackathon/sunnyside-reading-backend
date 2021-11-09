@@ -15,18 +15,6 @@ const fs = require('fs');
 const Parser = require('./parserInterface');
 const RoomCode = require('./lib/generateRoomCode');
 
-app.use( (req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "X-Requested-With");
-    next();
-});
-
-app.all('/', function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "X-Requested-With");
-    next();
-});
-
 app.get('/', (req, res) => {
     res.send('<h1>Hello world</h1>');
 });
