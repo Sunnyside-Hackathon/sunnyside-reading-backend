@@ -90,7 +90,7 @@ app.post('/generateCode', async (req, res) => {
 
 // Socket.io work
 // Events to listen to: [connection, enter-room, update-room, invalid-room, disconnect]
-// Events emitting: [update-event]
+// Events emitting: [update-event, successful-room-entrance]
 io.on('connection', (socket) => {
     
     // Whenever a user enters a room, check if they are the first person (if so, they would have a config)
@@ -102,12 +102,14 @@ io.on('connection', (socket) => {
                 config: config,
                 population: 1
             };
+            socket.emit('successful-room-entrance', {room: roomCode, id: socket.id});
         } else {
             // Checks if the room is valid first
             if (!rooms[roomCode]) {
                 socket.emit('invalid-room', roomCode);
             } else {
                 socket.join(roomCode);
+                socket.emit('successful-room-entrance', {room: roomCode, id: socket.id});
                 rooms[roomCode].population = rooms[roomCode].population + 1;
                 socket.to(roomCode).emit('update-event', rooms[roomCode].config);
             }
