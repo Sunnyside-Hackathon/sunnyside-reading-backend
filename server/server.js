@@ -24,11 +24,18 @@ const io = new Server(server, {
 const fs = require('fs');
 const Parser = require('./parserInterface');
 const RoomCode = require('./lib/generateRoomCode');
+const { SocketAddress } = require('net');
 
+const rooms = {};
+
+// Test endpoint
 app.get('/', (req, res) => {
     res.send('<h1>Hello world</h1>');
 });
 
+// Handles uploading of files
+// Uploads files to a temp folder, then calls the parsing interface to parse
+// Attempts to send back the parsed files as well as a room code
 app.post('/upload', async (req, res) => {
 
     if (!req.files || Object.keys(req.files).length === 0) {
@@ -72,6 +79,8 @@ app.post('/upload', async (req, res) => {
     });
 });
 
+// Generates a room code for the client
+// Use case: When a user has a previous session they wish to re-open
 app.post('/generateCode', async (req, res) => {
     const roomCode = RoomCode.generate();
     res.send({
@@ -79,14 +88,51 @@ app.post('/generateCode', async (req, res) => {
     });
 });
 
+// Socket.io work
+// Events to listen to: [connection, enter-room, update-room, invalid-room, disconnect]
+// Events emitting: [update-event]
 io.on('connection', (socket) => {
-    socket.on('enter-room', roomCode => {
-        socket.join(roomCode);
+    
+    // Whenever a user enters a room, check if they are the first person (if so, they would have a config)
+    // If not, they would not have a config and would need to receive the config
+    socket.on('enter-room', (roomCode, config) => {
+        if (config) {
+            socket.join(roomCode);
+            rooms[roomCode] = {
+                config: config,
+                population: 1
+            };
+        } else {
+            // Checks if the room is valid first
+            if (!rooms[roomCode]) {
+                socket.emit('invalid-room', roomCode);
+            } else {
+                socket.join(roomCode);
+                rooms[roomCode].population = rooms[roomCode].population + 1;
+                socket.to(roomCode).emit('update-event', rooms[roomCode].config);
+            }
+        }
     });
 
+    // Updates room config
     socket.on('update-room', (roomCode, config) => {
-        socket.to(roomCode).emit('update-event', config);
+        rooms[roomCode].config = config;
+        socket.to(roomCode).emit('update-event', rooms[roomCode].config);
     });
+
+    // On disconnect, check if room is empty
+    // If so, tear down the config info
+    socket.on('disconnect', (reason) => {
+        for (const room of socket.rooms) {
+            if (room !== socket.id) {
+                if (rooms[room].population === 1) {
+                    delete rooms[room];
+                } else {
+                    rooms[room].population = rooms[room].population;
+                }
+            }
+        }
+    })
 });
 
 server.listen(3000, () => {
