@@ -89,13 +89,14 @@ app.post('/generateCode', async (req, res) => {
 });
 
 // Socket.io work
-// Events to listen to: [connection, enter-room, update-room, invalid-room, disconnect]
-// Events emitting: [update-event, successful-room-entrance]
+// Events to listen to: [connection, enter-room, update-room, disconnect]
+// Events emitting: [update-event, successful-room-entrance, invalid-room]
 io.on('connection', (socket) => {
     
     // Whenever a user enters a room, check if they are the first person (if so, they would have a config)
     // If not, they would not have a config and would need to receive the config
-    socket.on('enter-room', (roomCode, config) => {
+    socket.on('enter-room', configObject => {
+        const {config, roomCode} = configObject
         if (config) {
             socket.join(roomCode);
             rooms[roomCode] = {
@@ -117,7 +118,8 @@ io.on('connection', (socket) => {
     });
 
     // Updates room config
-    socket.on('update-room', (roomCode, config) => {
+    socket.on('update-room', configObject => {
+        const {config, roomCode} = configObject
         rooms[roomCode].config = config;
         socket.to(roomCode).emit('update-event', rooms[roomCode].config);
     });
