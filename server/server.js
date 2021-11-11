@@ -23,7 +23,7 @@ const io = new Server(server, {
 
 const fs = require('fs');
 const Parser = require('./parserInterface');
-const RoomCode = require('./lib/generateRoomCode');
+const RoomCode = require('./generateRoomCode');
 const { SocketAddress } = require('net');
 
 const rooms = {};
