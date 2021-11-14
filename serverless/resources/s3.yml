@@ -1,0 +1,26 @@
+Resources:
+  PrononciationBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: 'sunnyside-reading-prononciations'
+  PrononciationBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref PrononciationBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - 's3:GetObject'
+            Resource:
+              - Fn::Join: [
+                 "", [
+                   "arn:aws:s3:::",
+                   {
+                     "Ref": "PrononciationBucket"
+                   },
+                   "/*"
+                 ]
+                ]
+            Principal: '*'

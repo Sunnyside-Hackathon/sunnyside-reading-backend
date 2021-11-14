@@ -1,0 +1,16 @@
+Resources:
+  PrononciationTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Prononciations-${self:provider.stage}
+      AttributeDefinitions:
+        - AttributeName: word
+          AttributeType: S
+        - AttributeName: definitionNum
+          AttributeType: S
+      KeySchema:
+        - AttributeName: word
+          KeyType: HASH
+        - AttributeName: definitionNum
+          KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST

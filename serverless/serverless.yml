@@ -1,0 +1,53 @@
+service: sunnyside-reading-api
+
+frameworkVersion: '2 || 3'
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  lambdaHashingVersion: 20201221
+  stage: dev
+  region: us-east-1
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - 'dynamodb:GetItem'
+            - 'dynamodb:Query'
+            - 'dynamodb:UpdateItem'
+            - 'dynamodb:PutItem'
+          Resource:
+            - 'arn:aws:dynamodb:us-east-1:996222342904:table/Prononciations-${self:provider.stage}'
+            - 'arn:aws:dynamodb:us-east-1:996222342904:table/Prononciations-${self:provider.stage}/*'
+        - Effect: Allow
+          Action:
+            - 's3:*'
+          Resource: 
+            - Fn::Join: [
+                "", [
+                  "arn:aws:s3:::",
+                  {
+                    "Ref": "PrononciationBucket"
+                  },
+                  "/*"
+                ]
+              ]
+
+functions:
+  Prononciation:
+    handler: handler.main
+    events:
+      - http:
+          path: /prononciation
+          method: post
+          cors: true
+    timeout: 600
+    environment:
+      TABLE: Prononciations-${self:provider.stage}
+      DICTIONARYKEY: d1870544-e661-46d8-8726-c33ffd3f41de
+      BUCKET_NAME: sunnyside-reading-prononciations
+
+resources:
+  - ${file(resources/s3.yml)}
+  - ${file(resources/dynamo.yml)}
