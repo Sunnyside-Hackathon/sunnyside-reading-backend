@@ -1,7 +1,7 @@
 {
   
   "scripts": {
-    "heroku-prebuild": "cd server && npm install && npm install python && pip install -r requirements.txt",
+    "heroku-prebuild": "cd server && npm install",
     "start": "cd server && node server.js"
   }
 }
