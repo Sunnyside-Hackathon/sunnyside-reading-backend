@@ -99,16 +99,16 @@ io.on('connection', (socket) => {
                 config: config,
                 population: 1
             };
-            socket.emit('successful-room-entrance', {room: roomCode, id: socket.id});
+            io.emit('successful-room-entrance', {room: roomCode, id: socket.id});
         } else {
             // Checks if the room is valid first
             if (!rooms[roomCode]) {
-                socket.emit('invalid-room', roomCode);
+                io.emit('invalid-room', roomCode);
             } else {
                 socket.join(roomCode);
-                socket.emit('successful-room-entrance', {room: roomCode, id: socket.id});
+                io.emit('successful-room-entrance', {room: roomCode, id: socket.id});
                 rooms[roomCode].population = rooms[roomCode].population + 1;
-                socket.to(roomCode).emit('update-event', rooms[roomCode].config);
+                io.to(roomCode).emit('update-event', rooms[roomCode].config);
             }
         }
     });
@@ -117,7 +117,7 @@ io.on('connection', (socket) => {
     socket.on('update-room', configObject => {
         const {config, roomCode} = configObject
         rooms[roomCode].config = config;
-        socket.to(roomCode).emit('update-event', rooms[roomCode].config);
+        io.to(roomCode).emit('update-event', rooms[roomCode].config);
     });
 
     // On disconnect, check if room is empty
